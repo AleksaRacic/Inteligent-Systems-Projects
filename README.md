@@ -1,2 +1,2 @@
 # ISIST_Projekat
-Inteligent Systems imework
+Inteligent Systems homework
