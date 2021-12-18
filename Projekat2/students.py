@@ -37,21 +37,21 @@ class MinimaxAgent(StudentAgent):
         state.adjust_win_loss()
         if state.is_win():
             if self.id == 0:
-                return 1, []
+                return 10, []
             else:
-                return -1, []
+                return -10, []
 
         elif state.is_loss():
             if self.id == 0:
-                return -1, []
+                return -10, []
             else:
-                return 1, []
+                return 10, []
         
         if not self.max_levels == -1 and current_level == self.max_levels:
-            return 0, []
+            return len(state.get_legal_actions(self.id)) - len(state.get_legal_actions(abs(self.id-1))), []
 
         is_max = agent_id == self.id
-        best_action_val = -2 if is_max else 2
+        best_action_val = -11 if is_max else 11
         actions_list = []
 
         for action in state.get_legal_actions(agent_id):
@@ -69,9 +69,6 @@ class MinimaxAgent(StudentAgent):
             if (not is_max) and best_action_val > action_val:
                 best_action_val = action_val
                 actions_list = []
-        
-        #print(f"Best action val: {best_action_val} Action list: {actions_list} Level AgentId: {agent_id} \n")
-        #print(state.char_map, "\n\n")
 
         return best_action_val, actions_list
 
@@ -81,7 +78,6 @@ class MinimaxAgent(StudentAgent):
         self.max_levels = max_levels
 
         val, actions = self.__minmax(state, self.id, 0)
-        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
         return actions[0]
 
 
@@ -97,21 +93,21 @@ class MinimaxABAgent(StudentAgent):
         state.adjust_win_loss()
         if state.is_win():
             if self.id == 0:
-                return 1, []
+                return 10, []
             else:
-                return -1, []
+                return -10, []
 
         elif state.is_loss():
             if self.id == 0:
-                return -1, []
+                return -10, []
             else:
-                return 1, []
+                return 10, []
         
         if not self.max_levels == -1 and current_level == self.max_levels:
-            return 0, []
+            return len(state.get_legal_actions(self.id)) - len(state.get_legal_actions(abs(self.id-1))), []
 
         is_max = agent_id == self.id
-        best_action_val = -1 if is_max else 1
+        best_action_val = -11 if is_max else 11
         actions_list = []
 
         for action in state.get_legal_actions(agent_id):
@@ -135,9 +131,6 @@ class MinimaxABAgent(StudentAgent):
                 beta = min(beta, best_action_val)
                 if beta <= alpha:
                     break
-        
-        #print(f"Best action val: {best_action_val} Action list: {actions_list} Level AgentId: {agent_id} \n")
-        #print(state.char_map, "\n\n")
 
         return best_action_val, actions_list
 
@@ -146,8 +139,8 @@ class MinimaxABAgent(StudentAgent):
             raise Exception("Student mora imati jednog protivnika")
         self.max_levels = max_levels
 
-        val, actions = self.__minmaxAB(state, 0, self.id, -2, 2)
-        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        val, actions = self.__minmaxAB(state, 0, self.id, -11, 11)
+        print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
         return actions[0]
 
 
@@ -171,7 +164,7 @@ class ExpectAgent(StudentAgent):
                 return 1, []
         
         if not self.max_levels == -1 and current_level == self.max_levels:
-            return 0, []
+            return len(state.get_legal_actions(self.id)) - len(state.get_legal_actions(abs(self.id - 1))), []
 
         is_max = agent_id == self.id
         if is_max:
@@ -196,9 +189,6 @@ class ExpectAgent(StudentAgent):
             
             if (not is_max):
                 best_action_val += probability * action_val
-        
-        #print(f"Best action val: {best_action_val} Action list: {actions_list} Level AgentId: {agent_id} \n")
-        #print(state.char_map, "\n\n")
 
         return best_action_val, actions_list
 
@@ -208,7 +198,6 @@ class ExpectAgent(StudentAgent):
         self.max_levels = max_levels
 
         val, actions = self.__expectimax(state, self.id, 0)
-        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
         return actions[0]
 
 class MaxNAgent(StudentAgent):
@@ -217,26 +206,28 @@ class MaxNAgent(StudentAgent):
         self.max_levels = -1
 
     def __minmaxNAB(self, state, current_level, agent_id, alpha, beta):
-        if state.is_agent_win(self.id):
-            return 1, []
-        elif state.is_agent_loss(self.id):
-            return -1, []
-        
-        if not self.max_levels == -1 and current_level == self.max_levels:
-            return 0, []
-
         is_max = agent_id == self.id
-        best_action_val = -2 if is_max else 2
+        #Terminal node
+        if state.is_agent_win(self.id):
+            return 10, []
+        if state.is_agent_loss(self.id):
+            return -1, []
+        if not self.max_levels == -1 and current_level == self.max_levels:
+            #More legal moves the better
+            return len(state.get_legal_actions(self.id)), []
+
+        best_action_val = -2 if is_max else 11
         actions_list = []
         actions = state.get_legal_actions(agent_id)
 
         if len(actions) == 0:
-            action_val, _ = self.__minmaxNAB(state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)
+            best_action_val, _ = self.__minmaxNAB(state, current_level, (agent_id + 1) % len(state.agents), alpha, beta)
         else:
             for action in actions:
                 new_state = state.apply_action(agent_id, action)
-                action_val, _ = self.__minmaxNAB(new_state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)
 
+                action_val, tmp = self.__minmaxNAB(new_state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)
+                
                 if best_action_val == action_val:
                     actions_list.append(action)
 
@@ -254,15 +245,10 @@ class MaxNAgent(StudentAgent):
                     beta = min(beta, best_action_val)
                     if beta <= alpha:
                         break
-        
-        #print(f"Best action val: {best_action_val} Action list: {actions_list} Level AgentId: {agent_id} \n")
-        #print(state.char_map, "\n\n")
 
         return best_action_val, actions_list
 
     def get_next_action(self, state, max_levels):
         self.max_levels = max_levels
-
-        val, actions = self.__minmaxNAB(state, 0, self.id, -3, 3)
-        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        val, actions = self.__minmaxNAB(state, 0, self.id, -3, 11)
         return actions[0]
