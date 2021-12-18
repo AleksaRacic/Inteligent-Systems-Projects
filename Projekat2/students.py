@@ -49,14 +49,13 @@ class MinimaxAgent(StudentAgent):
         
         if not self.max_levels == -1 and current_level == self.max_levels:
             return 0, []
-            #Videti da li je ovo ispravno
 
         is_max = agent_id == self.id
         best_action_val = -2 if is_max else 2
         actions_list = []
 
         for action in state.get_legal_actions(agent_id):
-            new_state = state.apply_action(agent_id, action) #Ne treba copy jer se kopira u funkciji
+            new_state = state.apply_action(agent_id, action)
             action_val, _ = self.__minmax(new_state, current_level + 1, (agent_id + 1) % 2)
 
             if best_action_val == action_val:
@@ -81,9 +80,9 @@ class MinimaxAgent(StudentAgent):
             raise Exception("Student mora imati jednog protivnika")
         self.max_levels = max_levels
 
-        val, actions = self.__minmax(state, self.id, 0) #Ne bi trebalo da vrati praznu listu, proveri!!
-        print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
-        return actions[0] #trebalo bi da se ubacuje po datom poretku jer se validni potezi vracaju po tom poretku
+        val, actions = self.__minmax(state, self.id, 0)
+        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        return actions[0]
 
 
 
@@ -110,14 +109,13 @@ class MinimaxABAgent(StudentAgent):
         
         if not self.max_levels == -1 and current_level == self.max_levels:
             return 0, []
-            #Videti da li je ovo ispravno
 
         is_max = agent_id == self.id
         best_action_val = -1 if is_max else 1
         actions_list = []
 
         for action in state.get_legal_actions(agent_id):
-            new_state = state.apply_action(agent_id, action) #Ne treba copy jer se kopira u funkciji
+            new_state = state.apply_action(agent_id, action)
             action_val, _ = self.__minmaxAB(new_state, current_level + 1, (agent_id + 1) % 2, alpha, beta)
 
             if best_action_val == action_val:
@@ -148,9 +146,9 @@ class MinimaxABAgent(StudentAgent):
             raise Exception("Student mora imati jednog protivnika")
         self.max_levels = max_levels
 
-        val, actions = self.__minmaxAB(state, 0, self.id, -2, 2) #Ne bi trebalo da vrati praznu listu, proveri!!
-        print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
-        return actions[0] #trebalo bi da se ubacuje po datom poretku jer se validni potezi vracaju po tom poretku
+        val, actions = self.__minmaxAB(state, 0, self.id, -2, 2)
+        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        return actions[0]
 
 
 class ExpectAgent(StudentAgent):
@@ -174,7 +172,6 @@ class ExpectAgent(StudentAgent):
         
         if not self.max_levels == -1 and current_level == self.max_levels:
             return 0, []
-            #Videti da li je ovo ispravno
 
         is_max = agent_id == self.id
         if is_max:
@@ -186,7 +183,7 @@ class ExpectAgent(StudentAgent):
         actions = state.get_legal_actions(agent_id)
         probability = 1/len(actions)
         for action in actions:
-            new_state = state.apply_action(agent_id, action) #Ne treba copy jer se kopira u funkciji
+            new_state = state.apply_action(agent_id, action)
             action_val, _ = self.__expectimax(new_state, current_level + 1, (agent_id + 1) % 2)
 
             if best_action_val == action_val:
@@ -210,9 +207,9 @@ class ExpectAgent(StudentAgent):
             raise Exception("Student mora imati jednog protivnika")
         self.max_levels = max_levels
 
-        val, actions = self.__expectimax(state, self.id, 0) #Ne bi trebalo da vrati praznu listu, proveri!!
-        print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
-        return actions[0] #trebalo bi da se ubacuje po datom poretku jer se validni potezi vracaju po tom poretku
+        val, actions = self.__expectimax(state, self.id, 0)
+        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        return actions[0]
 
 class MaxNAgent(StudentAgent):
     def __init__(self, position, file_name):
@@ -227,7 +224,6 @@ class MaxNAgent(StudentAgent):
         
         if not self.max_levels == -1 and current_level == self.max_levels:
             return 0, []
-            #Videti da li je ovo ispravno
 
         is_max = agent_id == self.id
         best_action_val = -2 if is_max else 2
@@ -235,10 +231,10 @@ class MaxNAgent(StudentAgent):
         actions = state.get_legal_actions(agent_id)
 
         if len(actions) == 0:
-            action_val, _ = self.__minmaxNAB(state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)#ostajestari state
+            action_val, _ = self.__minmaxNAB(state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)
         else:
             for action in actions:
-                new_state = state.apply_action(agent_id, action) #Ne treba copy jer se kopira u funkciji
+                new_state = state.apply_action(agent_id, action)
                 action_val, _ = self.__minmaxNAB(new_state, current_level + 1, (agent_id + 1) % len(state.agents), alpha, beta)
 
                 if best_action_val == action_val:
@@ -267,6 +263,6 @@ class MaxNAgent(StudentAgent):
     def get_next_action(self, state, max_levels):
         self.max_levels = max_levels
 
-        val, actions = self.__minmaxNAB(state, 0, self.id, -3, 3) #Ne bi trebalo da vrati praznu listu, proveri!!
-        print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
-        return actions[0] #trebalo bi da se ubacuje po datom poretku jer se validni potezi vracaju po tom poretku
+        val, actions = self.__minmaxNAB(state, 0, self.id, -3, 3)
+        #print(f"Agent {self.id}: potezi {actions}, sa vrednoscu {val}")
+        return actions[0]
